@@ -118,7 +118,7 @@ namespace TestingProject
         }
 
         [Fact]
-public void Test_POST_AddReservation()
+        public void Test_POST_AddReservation()
         {
             // Arrange
             Reservation r = new Reservation()
@@ -141,6 +141,32 @@ public void Test_POST_AddReservation()
             Assert.Equal("Test Four", reservation.Name);
             Assert.Equal("SL4", reservation.StartLocation);
             Assert.Equal("EL4", reservation.EndLocation);
+        }
+
+        [Fact]
+        public void Test_PUT_UpdateReservation()
+        {
+            // Arrange
+            Reservation r = new Reservation()
+            {
+                Id = 3,
+                Name = "new name",
+                StartLocation = "new start location",
+                EndLocation = "new end location"
+            };
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo.UpdateReservation(It.IsAny<Reservation>())).Returns(r);
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            var result = controller.Put(r);
+
+            // Assert
+            var reservation = Assert.IsType<Reservation>(result);
+            Assert.Equal(3, reservation.Id);
+            Assert.Equal("new name", reservation.Name);
+            Assert.Equal("new start location", reservation.StartLocation);
+            Assert.Equal("new end location", reservation.EndLocation);
         }
 
     }
