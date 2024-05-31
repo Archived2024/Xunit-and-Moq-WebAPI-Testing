@@ -169,5 +169,20 @@ namespace TestingProject
             Assert.Equal("new end location", reservation.EndLocation);
         }
 
+        [Fact]
+        public void Test_DELETE_Reservation()
+        {
+            // Arrange
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo.DeleteReservation(It.IsAny<int>())).Verifiable();
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            controller.Delete(3);
+
+            // Assert
+            mockRepo.Verify();
+        }
+
     }
 }
