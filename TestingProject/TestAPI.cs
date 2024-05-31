@@ -100,5 +100,48 @@ namespace TestingProject
             Assert.Equal(id, ((Reservation)actionValue.Value).Id);
         }
 
+        [Fact]
+        public void Test_GET_AReservations_NotFound()
+        {
+            // Arrange
+            int id = 4;
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            var result = controller.Get(id);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Reservation>>(result);
+            Assert.IsType<NotFoundResult>(actionResult.Result);
+        }
+
+        [Fact]
+public void Test_POST_AddReservation()
+        {
+            // Arrange
+            Reservation r = new Reservation()
+            {
+                Id = 4,
+                Name = "Test Four",
+                StartLocation = "SL4",
+                EndLocation = "EL4"
+            };
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo.AddReservation(It.IsAny<Reservation>())).Returns(r);
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            var result = controller.Post(r);
+
+            // Assert
+            var reservation = Assert.IsType<Reservation>(result);
+            Assert.Equal(4, reservation.Id);
+            Assert.Equal("Test Four", reservation.Name);
+            Assert.Equal("SL4", reservation.StartLocation);
+            Assert.Equal("EL4", reservation.EndLocation);
+        }
+
     }
 }
