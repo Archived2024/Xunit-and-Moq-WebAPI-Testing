@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using MyAppT.Controllers;
 using MyAppT.Infrastructure;
@@ -56,6 +57,47 @@ namespace TestingProject
                 }
             };
             return r;
+        }
+
+        [Fact]
+        public void Test_GET_AReservations_BadRequest()
+        {
+            // Arrange
+            int id = 0;
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((a) => Single(a));
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            var result = controller.Get(id);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Reservation>>(result);
+            Assert.IsType<BadRequestObjectResult>(actionResult.Result);
+        }
+
+        private static Reservation Single(int id)
+        {
+            IEnumerable<Reservation> reservations = Multiple();
+            return reservations.Where(a => a.Id == id).FirstOrDefault();
+        }
+
+        [Fact]
+        public void Test_GET_AReservations_Ok()
+        {
+            // Arrange
+            int id = 1;
+            var mockRepo = new Mock<IRepository>();
+            mockRepo.Setup(repo => repo[It.IsAny<int>()]).Returns<int>((id) => Single(id));
+            var controller = new ReservationController(mockRepo.Object);
+
+            // Act
+            var result = controller.Get(id);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<Reservation>>(result);
+            var actionValue = Assert.IsType<OkObjectResult>(actionResult.Result);
+            Assert.Equal(id, ((Reservation)actionValue.Value).Id);
         }
 
     }
